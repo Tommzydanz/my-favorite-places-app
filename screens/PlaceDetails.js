@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Image, Alert } from 'react-native';
 import OutlineButton from '../components/ui/OutlineButton';
 import { Colors } from '../constants/colors';
-import { fetchPlaceDetails } from '../util/database';
+import IconButton from '../components/ui/IconButton';
+import { deletePlaceFromDetails, fetchPlaceDetails } from '../util/database';
 
 
 function PlaceDetails ({route, navigation}){
   const [fetchedPlace, setFetchedPlace] = useState();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+
   function showOnMapHandler(){
     navigation.navigate('Map', {
       initialLat: fetchedPlace.location.lat,
@@ -39,6 +43,14 @@ function PlaceDetails ({route, navigation}){
   }
 
 
+  async function deletePlaceHandler(){
+    setIsDeleting(true);
+    await deletePlaceFromDetails(selectedPlaceId);
+    setIsDeleting(false);
+    navigation.navigate('FavoritePlaces');
+    
+  }
+
   return (
     <ScrollView>
       <Image style={styles.image} source={{uri: fetchedPlace.imageUri}} />
@@ -49,6 +61,9 @@ function PlaceDetails ({route, navigation}){
         <OutlineButton icon="map" onPress={showOnMapHandler}>
           View on Map
         </OutlineButton>
+        <View style={styles.deleteIconContainer}>
+          <IconButton icon="trash-bin" size={24} color={Colors.red500} onPress={deletePlaceHandler}/>
+        </View>
       </View>
     </ScrollView>
   );
@@ -80,4 +95,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  deleteIconContainer: {
+    margin: 24,
+    alignItems: 'center',
+
+  }
 });

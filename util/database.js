@@ -104,13 +104,33 @@ export function fetchPlaceDetails(id){
               lat: dbPlace.lat,
               lng: dbPlace.lng,
             });
-          resolve(place);
+            console.log(result);
+            resolve(place);
         },
         (_, error) => {
           reject(error);
         }
       );
     });
+  });
+  return promise;
+}
+
+export function deletePlaceFromDetails(id){
+  const promise = new Promise((resolve, reject) => {
+    database.transaction((tx) => {
+      tx.executeSql(`DELETE FROM places WHERE id =?`,
+      [id],
+      (_, result)=> {
+        const dbPlace = result.rowsAffected;
+        if(dbPlace > 0){
+          resolve(dbPlace);
+        }
+      },
+      (_, error)=> {
+        reject(error);
+      },)
+    })
   });
   return promise;
 }
